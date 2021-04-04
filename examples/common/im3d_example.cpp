@@ -481,7 +481,7 @@ static const char* StripPath(const char* _path)
 		// Open a window and create its OpenGL context
 		GLFWwindow* window; // (In the accompanying source code, this variable is global for simplicity)
 		// TODO: pass better width, height
-		window = glfwCreateWindow(800, 600, _title, NULL, NULL);
+		window = glfwCreateWindow(1280, 720, _title, NULL, NULL);
 		if(window == NULL){
 			fprintf(stderr, "Failed to open GLFW window\n");
 			glfwTerminate();
@@ -1589,61 +1589,14 @@ bool Example::update()
 	{
 		if (!ImGui::GetIO().WantCaptureKeyboard)
 		{
-			bool ctrlDown = false;
-			#if defined(IM3D_PLATFORM_WIN)
-				ctrlDown = ((GetAsyncKeyState(VK_LCONTROL) & 0x8000) != 0);
-			#elif defined(IM3D_PLATFORM_LINUX)
-				ctrlDown = (glfwGetKey(m_Window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS);
-			#endif
-
-			bool shiftDown = false;
-			#if defined(IM3D_PLATFORM_WIN)
-				shiftDown = ((GetAsyncKeyState(VK_LSHIFT) & 0x8000) != 0);
-			#elif defined(IM3D_PLATFORM_LINUX)
-				shiftDown = (glfwGetKey(m_Window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS);
-			#endif
-
-			bool wDown = false;
-			#if defined(IM3D_PLATFORM_WIN)
-				wDown = ((GetAsyncKeyState(0x57) & 0x8000) != 0);
-			#elif defined(IM3D_PLATFORM_LINUX)
-				wDown = (glfwGetKey(m_Window, GLFW_KEY_W) == GLFW_PRESS);
-			#endif
-
-			bool aDown = false;
-			#if defined(IM3D_PLATFORM_WIN)
-				aDown = ((GetAsyncKeyState(0x41) & 0x8000) != 0);
-			#elif defined(IM3D_PLATFORM_LINUX)
-				aDown = (glfwGetKey(m_Window, GLFW_KEY_A) == GLFW_PRESS);
-			#endif
-
-			bool sDown = false;
-			#if defined(IM3D_PLATFORM_WIN)
-				sDown = ((GetAsyncKeyState(0x53) & 0x8000) != 0);
-			#elif defined(IM3D_PLATFORM_LINUX)
-				sDown = (glfwGetKey(m_Window, GLFW_KEY_S) == GLFW_PRESS);
-			#endif
-
-			bool dDown = false;
-			#if defined(IM3D_PLATFORM_WIN)
-				dDown = ((GetAsyncKeyState(0x44) & 0x8000) != 0);
-			#elif defined(IM3D_PLATFORM_LINUX)
-				dDown = (glfwGetKey(m_Window, GLFW_KEY_D) == GLFW_PRESS);
-			#endif
-
-			bool qDown = false;
-			#if defined(IM3D_PLATFORM_WIN)
-				qDown = ((GetAsyncKeyState(0x51) & 0x8000) != 0);
-			#elif defined(IM3D_PLATFORM_LINUX)
-				qDown = (glfwGetKey(m_Window, GLFW_KEY_Q) == GLFW_PRESS);
-			#endif
-
-			bool eDown = false;
-			#if defined(IM3D_PLATFORM_WIN)
-				eDown = ((GetAsyncKeyState(0x45) & 0x8000) != 0);
-			#elif defined(IM3D_PLATFORM_LINUX)
-				eDown = (glfwGetKey(m_Window, GLFW_KEY_E) == GLFW_PRESS);
-			#endif
+			bool ctrlDown = (glfwGetKey(m_Window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS);
+			bool shiftDown = (glfwGetKey(m_Window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS);
+			bool wDown = (glfwGetKey(m_Window, GLFW_KEY_W) == GLFW_PRESS);
+			bool aDown = (glfwGetKey(m_Window, GLFW_KEY_A) == GLFW_PRESS);
+			bool sDown = (glfwGetKey(m_Window, GLFW_KEY_S) == GLFW_PRESS);
+			bool dDown = (glfwGetKey(m_Window, GLFW_KEY_D) == GLFW_PRESS);
+			bool qDown = (glfwGetKey(m_Window, GLFW_KEY_Q) == GLFW_PRESS);
+			bool eDown = (glfwGetKey(m_Window, GLFW_KEY_E) == GLFW_PRESS);
 
 			if (shiftDown)
 			{
@@ -1679,13 +1632,7 @@ bool Example::update()
 		}
 		if (!ImGui::GetIO().WantCaptureMouse)
 		{
-			bool mouseRightDown = false;
-			#if defined(IM3D_PLATFORM_WIN)
-				mouseRightDown = ((GetAsyncKeyState(VK_RBUTTON) & 0x8000) != 0);
-			#elif defined(IM3D_PLATFORM_LINUX)
-				mouseRightDown = (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS);
-			#endif
-
+			bool mouseRightDown = (glfwGetMouseButton(m_Window, GLFW_MOUSE_BUTTON_2) == GLFW_PRESS);
 			if (mouseRightDown)
 			{
 				Vec2 cursorDelta = ((cursorPos - m_prevCursorPos) / Vec2((float)m_width, (float)m_height)) * kCamRotationMul;
@@ -1794,7 +1741,7 @@ void Example::draw()
 		#endif
 	#endif
 
-	#if defined(IM3D_PLATFORM_LINUX)
+	#if defined(IM3D_PLATFORM_LINUX) && defined(IM3D_OPENGL)
 		glfwSwapBuffers(m_Window);
 	#endif
 
@@ -1824,18 +1771,9 @@ bool Example::hasFocus() const
 
 Vec2 Example::getWindowRelativeCursor() const
 {
-	#if defined(IM3D_PLATFORM_WIN)
-		POINT p = {};
-		winAssert(GetCursorPos(&p));
-		winAssert(ScreenToClient(m_hwnd, &p));
-		return Vec2((float)p.x, (float)p.y);
-	#endif
-	#if defined(IM3D_PLATFORM_LINUX)
-		double mouse_x, mouse_y;
-		glfwGetCursorPos(m_Window, &mouse_x, &mouse_y);
-		return Vec2((float)mouse_x, (float)mouse_y);
-	#endif
-		return {};
+	double mouse_x, mouse_y;
+	glfwGetCursorPos(m_Window, &mouse_x, &mouse_y);
+	return Vec2((float)mouse_x, (float)mouse_y);
 }
 
 void Example::drawTextDrawListsImGui(const Im3d::TextDrawList _textDrawLists[], U32 _count)
