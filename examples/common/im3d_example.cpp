@@ -246,115 +246,7 @@ static const char* StripPath(const char* _path)
 		}
 	}
 
-	#if defined(IM3D_OPENGL)
-		#include "GL/wglew.h"
-		static PFNWGLCHOOSEPIXELFORMATARBPROC    wglChoosePixelFormat    = 0;
-		static PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribs = 0;
-
-
-		static bool InitOpenGL(int _vmaj, int _vmin)
-		{
-			HWND hwnd = g_Example->m_hwnd;
-			winAssert(g_Example->m_hdc = GetDC(hwnd));
-			HDC hdc = g_Example->m_hdc;
-
-		 // set the window pixel format
-			PIXELFORMATDESCRIPTOR pfd = {};
-			pfd.nSize        = sizeof(PIXELFORMATDESCRIPTOR);
-			pfd.nVersion     = 1;
-			pfd.dwFlags      = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER | PFD_GENERIC_ACCELERATED;
-			pfd.iPixelType   = PFD_TYPE_RGBA;
-			pfd.cColorBits   = 24;
-			pfd.cDepthBits   = 24;
-			pfd.dwDamageMask = 8;
-			int pformat = 0;
-			winAssert(pformat = ChoosePixelFormat(hdc, &pfd));
-			winAssert(SetPixelFormat(hdc, pformat, &pfd));
-
-		 // create dummy context to load wgl extensions
-			HGLRC hglrc = 0;
-			winAssert(hglrc = wglCreateContext(hdc));
-			winAssert(wglMakeCurrent(hdc, hglrc));
-
-		 // check the platform supports the requested GL version
-			GLint platformVMaj, platformVMin;
-			glAssert(glGetIntegerv(GL_MAJOR_VERSION, &platformVMaj));
-			glAssert(glGetIntegerv(GL_MINOR_VERSION, &platformVMin));
-			_vmaj = _vmaj < 0 ? platformVMaj : _vmaj;
-			_vmin = _vmin < 0 ? platformVMin : _vmin;
-			if (platformVMaj < _vmaj || (platformVMaj >= _vmaj && platformVMin < _vmin))
-			{
-				fprintf(stderr, "OpenGL version %d.%d is not available (available version is %d.%d).", _vmaj, _vmin, platformVMaj, platformVMin);
-				fprintf(stderr, "This error may occur if the platform has an integrated GPU.");
-
-				return false;
-			}
-
-		 // load wgl extensions for true context creation
-			static PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribs;
-			winAssert(wglCreateContextAttribs = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB"));
-
-		 // delete the dummy context
-			winAssert(wglMakeCurrent(0, 0));
-			winAssert(wglDeleteContext(hglrc));
-
-		 // create true context
-			int profileBit = WGL_CONTEXT_CORE_PROFILE_BIT_ARB;
-			//profileBit = WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB;
-			int attr[] =
-				{
-					WGL_CONTEXT_MAJOR_VERSION_ARB,	_vmaj,
-					WGL_CONTEXT_MINOR_VERSION_ARB,	_vmin,
-					WGL_CONTEXT_PROFILE_MASK_ARB,	profileBit,
-					0
-				};
-			winAssert(g_Example->m_hglrc = wglCreateContextAttribs(hdc, 0, attr));
-			hglrc = g_Example->m_hglrc;
-
-		// load extensions
-			if (!wglMakeCurrent(hdc, hglrc))
-			{
-				fprintf(stderr, "wglMakeCurrent failed");
-				return false;
-			}
-			glewExperimental = GL_TRUE;
-			GLenum err = glewInit();
-			IM3D_ASSERT(err == GLEW_OK);
-			glGetError(); // clear any errors caused by glewInit()
-
-			winAssert(wglSwapIntervalEXT(0)); // example uses FPS as a rough perf measure, hence disable vsync
-
-			fprintf(stdout, "OpenGL context:\n\tVersion: %s\n\tGLSL Version: %s\n\tVendor: %s\n\tRenderer: %s\n",
-				GlGetString(GL_VERSION),
-				GlGetString(GL_SHADING_LANGUAGE_VERSION),
-				GlGetString(GL_VENDOR),
-				GlGetString(GL_RENDERER)
-				);
-
-			if (_vmaj == 3 && _vmin == 1)
-			{
-			 // check that the uniform blocks size is at least 64kb
-				GLint maxUniformBlockSize;
-				glAssert(glGetIntegerv(GL_MAX_UNIFORM_BLOCK_SIZE, &maxUniformBlockSize));
-				if (maxUniformBlockSize < (64*1024))
-				{
-					IM3D_ASSERT(false);
-					fprintf(stderr, "GL_MAX_UNIFORM_BLOCK_SIZE is less than 64kb (%dkb)", maxUniformBlockSize / 1024);
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		static void ShutdownOpenGL()
-		{
-			winAssert(wglMakeCurrent(0, 0));
-			winAssert(wglDeleteContext(g_Example->m_hglrc));
-			winAssert(ReleaseDC(g_Example->m_hwnd, g_Example->m_hdc) != 0);
-		}
-
-	#elif defined(IM3D_DX11)
+	#if defined(IM3D_DX11)
 		#include <d3dcompiler.h>
 
 		static bool InitDx11()
@@ -428,46 +320,6 @@ static const char* StripPath(const char* _path)
 
 /******************************************************************************/
 #if defined(IM3D_PLATFORM_LINUX)
-	static bool g_MouseJustPressed[ImGuiMouseButton_COUNT] = {};
-
-	static void ImGui_ImplGlfw_MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
-	{
-		if (action == GLFW_PRESS && button >= 0 && button < IM_ARRAYSIZE(g_MouseJustPressed))
-			g_MouseJustPressed[button] = true;
-	}
-
-	static void ImGui_ImplGlfw_ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
-	{
-		ImGuiIO& io = ImGui::GetIO();
-		io.MouseWheelH += (float)xoffset;
-		io.MouseWheel += (float)yoffset;
-	}
-
-	static void ImGui_ImplGlfw_KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
-	{
-		ImGuiIO& io = ImGui::GetIO();
-		if (action == GLFW_PRESS)
-			io.KeysDown[key] = true;
-		if (action == GLFW_RELEASE)
-			io.KeysDown[key] = false;
-
-		// Modifiers are not reliable across systems
-		io.KeyCtrl = io.KeysDown[GLFW_KEY_LEFT_CONTROL] || io.KeysDown[GLFW_KEY_RIGHT_CONTROL];
-		io.KeyShift = io.KeysDown[GLFW_KEY_LEFT_SHIFT] || io.KeysDown[GLFW_KEY_RIGHT_SHIFT];
-		io.KeyAlt = io.KeysDown[GLFW_KEY_LEFT_ALT] || io.KeysDown[GLFW_KEY_RIGHT_ALT];
-#ifdef _WIN32
-		io.KeySuper = false;
-#else
-		io.KeySuper = io.KeysDown[GLFW_KEY_LEFT_SUPER] || io.KeysDown[GLFW_KEY_RIGHT_SUPER];
-#endif
-	}
-
-	void ImGui_ImplGlfw_CharCallback(GLFWwindow* window, unsigned int c)
-	{
-		ImGuiIO& io = ImGui::GetIO();
-		io.AddInputCharacter(c);
-	}
-
 	static bool InitWindow(int& _width_, int& _height_, const char* _title) {
 		if(!glfwInit()) {
 			fprintf(stderr, "Failed to initialize GLFW\n");
@@ -495,29 +347,13 @@ static const char* StripPath(const char* _path)
 		}
 		g_Example->m_Window = window;
 
-		glfwSetMouseButtonCallback(window, ImGui_ImplGlfw_MouseButtonCallback);
-		glfwSetScrollCallback(window, ImGui_ImplGlfw_ScrollCallback);
-		glfwSetKeyCallback(window, ImGui_ImplGlfw_KeyCallback);
-		glfwSetCharCallback(window, ImGui_ImplGlfw_CharCallback);
-
 		return true;
 	}
 
 	static void ShutdownWindow()
 	{
+		glfwDestroyWindow(g_Example->m_Window);
 	}
-
-	#if defined(IM3D_OPENGL)
-		static bool InitOpenGL(int _vmaj, int _vmin)
-		{
-			// initialized in InitWindow
-			return true;
-		}
-
-		static void ShutdownOpenGL()
-		{
-		}
-	#endif // graphics
 
 #endif // platform
 
@@ -997,142 +833,27 @@ Color Im3d::RandColor(float _min, float _max)
 
 /******************************************************************************/
 #if defined(IM3D_OPENGL)
-	static GLuint g_ImGuiVertexArray;
-	static GLuint g_ImGuiVertexBuffer;
-	static GLuint g_ImGuiIndexBuffer;
-	static GLuint g_ImGuiShader;
-	static GLuint g_ImGuiFontTexture;
-
 	static void ImGui_Draw(ImDrawData* _drawData)
 	{
-		ImGuiIO& io = ImGui::GetIO();
-
-		int fbX, fbY;
-		fbX = (int)(io.DisplaySize.x * io.DisplayFramebufferScale.x);
-		fbY = (int)(io.DisplaySize.y * io.DisplayFramebufferScale.y);
-		if (fbX == 0  || fbY == 0)
-		{
-			return;
-		}
-		_drawData->ScaleClipRects(io.DisplayFramebufferScale);
-
-		glAssert(glViewport(0, 0, (GLsizei)fbX, (GLsizei)fbY));
-		glAssert(glEnable(GL_BLEND));
-		glAssert(glBlendEquation(GL_FUNC_ADD));
-		glAssert(glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA));
-		glAssert(glDisable(GL_CULL_FACE));
-		glAssert(glDisable(GL_DEPTH_TEST));
-		glAssert(glEnable(GL_SCISSOR_TEST));
-		glAssert(glActiveTexture(GL_TEXTURE0));
-
-		Mat4 ortho = Mat4(
-			2.0f/io.DisplaySize.x, 0.0f,                   0.0f, -1.0f,
-			0.0f,                  2.0f/-io.DisplaySize.y, 0.0f,  1.0f,
-			0.0f,                  0.0f,                   1.0f,  0.0f
-			);
-		glAssert(glUseProgram(g_ImGuiShader));
-
-		bool transpose = false;
-		#ifdef IM3D_MATRIX_ROW_MAJOR
-			transpose = true;
-		#endif
-		glAssert(glUniformMatrix4fv(glGetUniformLocation(g_ImGuiShader, "uProjMatrix"), 1, transpose, (const GLfloat*)ortho));
-		glAssert(glBindVertexArray(g_ImGuiVertexArray));
-
-		for (int i = 0; i < _drawData->CmdListsCount; ++i)
-		{
-			const ImDrawList* drawList = _drawData->CmdLists[i];
-			const ImDrawIdx* indexOffset = 0;
-
-			glAssert(glBindBuffer(GL_ARRAY_BUFFER, g_ImGuiVertexBuffer));
-			glAssert(glBufferData(GL_ARRAY_BUFFER, drawList->VtxBuffer.size() * sizeof(ImDrawVert), (GLvoid*)&drawList->VtxBuffer.front(), GL_STREAM_DRAW));
-			glAssert(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_ImGuiIndexBuffer));
-			glAssert(glBufferData(GL_ELEMENT_ARRAY_BUFFER, drawList->IdxBuffer.Size * sizeof(ImDrawIdx), (GLvoid*)drawList->IdxBuffer.Data, GL_STREAM_DRAW));
-
-			for (const ImDrawCmd* pcmd = drawList->CmdBuffer.begin(); pcmd != drawList->CmdBuffer.end(); ++pcmd)
-			{
-				if (pcmd->UserCallback)
-				{
-					pcmd->UserCallback(drawList, pcmd);
-				}
-				else
-				{
-					glAssert(glBindTexture(GL_TEXTURE_2D, (GLuint)(intptr_t)pcmd->TextureId));
-					glAssert(glScissor((int)pcmd->ClipRect.x, (int)(fbY - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y)));
-					glAssert(glDrawElements(GL_TRIANGLES, pcmd->ElemCount, GL_UNSIGNED_SHORT, (GLvoid*)indexOffset));
-				}
-				indexOffset += pcmd->ElemCount;
-			}
-		}
-
-		glAssert(glDisable(GL_SCISSOR_TEST));
-		glAssert(glDisable(GL_BLEND));
-		glAssert(glUseProgram(0));
+		int display_w, display_h;
+		glfwGetFramebufferSize(g_Example->m_Window, &display_w, &display_h);
+		glViewport(0, 0, display_w, display_h);
+		ImGui_ImplOpenGL3_RenderDrawData(_drawData);
 	}
 
 	static bool ImGui_Init()
 	{
-		GLuint vs = LoadCompileShader(GL_VERTEX_SHADER,   "imgui.glsl", "VERTEX_SHADER\0");
-		GLuint fs = LoadCompileShader(GL_FRAGMENT_SHADER, "imgui.glsl", "FRAGMENT_SHADER\0");
-		if (vs && fs)
-		{
-			glAssert(g_ImGuiShader = glCreateProgram());
-			glAssert(glAttachShader(g_ImGuiShader, vs));
-			glAssert(glAttachShader(g_ImGuiShader, fs));
-			bool ret = LinkShaderProgram(g_ImGuiShader);
-			glAssert(glDeleteShader(vs));
-			glAssert(glDeleteShader(fs));
-			if (!ret)
-			{
-				return false;
-			}
-		}
-		else
-		{
-			return false;
-		}
-
-		glAssert(glUseProgram(g_ImGuiShader));
-		glAssert(glUniform1i(glGetUniformLocation(g_ImGuiShader, "txTexture"), 0));
-		glAssert(glUseProgram(0));
-
-		glAssert(glGenBuffers(1, &g_ImGuiVertexBuffer));
-		glAssert(glGenBuffers(1, &g_ImGuiIndexBuffer));
-		glAssert(glGenVertexArrays(1, &g_ImGuiVertexArray));
-		glAssert(glBindVertexArray(g_ImGuiVertexArray));
-		glAssert(glBindBuffer(GL_ARRAY_BUFFER, g_ImGuiVertexBuffer));
-		glAssert(glEnableVertexAttribArray(0));
-		glAssert(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(ImDrawVert), (GLvoid*)offsetof(ImDrawVert, pos)));
-		glAssert(glEnableVertexAttribArray(1));
-		glAssert(glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(ImDrawVert), (GLvoid*)offsetof(ImDrawVert, uv)));
-		glAssert(glEnableVertexAttribArray(2));
-		glAssert(glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(ImDrawVert), (GLvoid*)offsetof(ImDrawVert, col)));
-		glAssert(glBindVertexArray(0));
-
-		unsigned char* txbuf;
-		int txX, txY;
-		ImGuiIO& io = ImGui::GetIO();
-		io.Fonts->GetTexDataAsAlpha8(&txbuf, &txX, &txY);
-		glAssert(glGenTextures(1, &g_ImGuiFontTexture));
-		glAssert(glBindTexture(GL_TEXTURE_2D, g_ImGuiFontTexture));
-		glAssert(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-		glAssert(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-		glAssert(glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, txX, txY, 0, GL_RED, GL_UNSIGNED_BYTE, (const GLvoid*)txbuf));
-		io.Fonts->TexID = (void*)(intptr_t)g_ImGuiFontTexture;
-
+		ImGui::CreateContext();
 		ImGui::StyleColorsDark();
-
-		return true;
-
+		ImGui_ImplGlfw_InitForOpenGL(g_Example->m_Window, true);
+		return ImGui_ImplOpenGL3_Init("#version " IM3D_STRINGIFY(IM3D_OPENGL_VSHADER));
 	}
 
 	static void ImGui_Shutdown()
 	{
-		glAssert(glDeleteVertexArrays(1, &g_ImGuiVertexArray));
-		glAssert(glDeleteBuffers(1, &g_ImGuiVertexBuffer));
-		glAssert(glDeleteBuffers(1, &g_ImGuiIndexBuffer));
-		glAssert(glDeleteProgram(g_ImGuiShader));
-		glAssert(glDeleteTextures(1, &g_ImGuiFontTexture));
+		ImGui_ImplOpenGL3_Shutdown();
+		ImGui_ImplGlfw_Shutdown();
+		ImGui::DestroyContext();
 	}
 
 #elif defined(IM3D_DX11)
@@ -1377,49 +1098,14 @@ Color Im3d::RandColor(float _min, float _max)
 #if defined(IM3D_PLATFORM_LINUX)
 	static void ImGui_Update()
 	{
-		ImGuiIO& io = ImGui::GetIO();
-
-		// Keyboard mapping. Dear ImGui will use those indices to peek into the io.KeysDown[] array.
-		io.KeyMap[ImGuiKey_Tab] = GLFW_KEY_TAB;
-		io.KeyMap[ImGuiKey_LeftArrow] = GLFW_KEY_LEFT;
-		io.KeyMap[ImGuiKey_RightArrow] = GLFW_KEY_RIGHT;
-		io.KeyMap[ImGuiKey_UpArrow] = GLFW_KEY_UP;
-		io.KeyMap[ImGuiKey_DownArrow] = GLFW_KEY_DOWN;
-		io.KeyMap[ImGuiKey_PageUp] = GLFW_KEY_PAGE_UP;
-		io.KeyMap[ImGuiKey_PageDown] = GLFW_KEY_PAGE_DOWN;
-		io.KeyMap[ImGuiKey_Home] = GLFW_KEY_HOME;
-		io.KeyMap[ImGuiKey_End] = GLFW_KEY_END;
-		io.KeyMap[ImGuiKey_Insert] = GLFW_KEY_INSERT;
-		io.KeyMap[ImGuiKey_Delete] = GLFW_KEY_DELETE;
-		io.KeyMap[ImGuiKey_Backspace] = GLFW_KEY_BACKSPACE;
-		io.KeyMap[ImGuiKey_Space] = GLFW_KEY_SPACE;
-		io.KeyMap[ImGuiKey_Enter] = GLFW_KEY_ENTER;
-		io.KeyMap[ImGuiKey_Escape] = GLFW_KEY_ESCAPE;
-		io.KeyMap[ImGuiKey_A] = GLFW_KEY_A;
-		io.KeyMap[ImGuiKey_C] = GLFW_KEY_C;
-		io.KeyMap[ImGuiKey_V] = GLFW_KEY_V;
-		io.KeyMap[ImGuiKey_X] = GLFW_KEY_X;
-		io.KeyMap[ImGuiKey_Y] = GLFW_KEY_Y;
-		io.KeyMap[ImGuiKey_Z] = GLFW_KEY_Z;
-
-		// Setup display size (every frame to accommodate for window resizing)
-		int w, h;
-		int display_w, display_h;
-		glfwGetWindowSize(g_Example->m_Window, &w, &h);
-		glfwGetFramebufferSize(g_Example->m_Window, &display_w, &display_h);
-		io.DisplaySize = ImVec2((float)w, (float)h);
-		if (w > 0 && h > 0)
-			io.DisplayFramebufferScale = ImVec2((float)display_w / w, (float)display_h / h);
-
-		g_Example->m_width = w;
-		g_Example->m_height = h;
-
-
-		// Setup time step
-		double current_time = glfwGetTime();
-		io.DeltaTime = g_Example->m_deltaTime;
-
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
+
+		ImGuiIO& io = ImGui::GetIO();
+		g_Example->m_deltaTime = io.DeltaTime;
+		g_Example->m_width = io.DisplaySize.x;
+		g_Example->m_height = io.DisplaySize.y;
 	}
 #endif
 
@@ -1466,12 +1152,7 @@ bool Example::init(int _width, int _height, const char* _title)
 	{
 		goto Example_init_fail;
 	}
-	#if defined(IM3D_OPENGL)
-		if (!InitOpenGL(IM3D_OPENGL_VMAJ, IM3D_OPENGL_VMIN))
-		{
-			goto Example_init_fail;
-		}
-	#elif defined(IM3D_DX11)
+	#if defined(IM3D_DX11)
 		if (!InitDx11())
 		{
 			goto Example_init_fail;
@@ -1505,16 +1186,11 @@ void Example::shutdown()
 	ImGui_Shutdown();
 	Im3d_Shutdown();
 
-	#if defined(IM3D_OPENGL)
-		ShutdownOpenGL();
-	#elif defined(IM3D_DX11)
+	#if defined(IM3D_DX11)
 		ShutdownDx11();
 	#endif
 
 	ShutdownWindow();
-
-	ImGui::EndFrame(); // prevent assert due to locked font atlas in DestroyContext() call below
-	ImGui::DestroyContext();
 }
 
 bool Example::update()
@@ -1540,40 +1216,10 @@ bool Example::update()
 		m_currTime = glfwGetTime();
 		m_deltaTime = m_currTime - m_prevTime;
 
-		ImGuiIO& io = ImGui::GetIO();
 		glfwPollEvents();
 		if(glfwWindowShouldClose(m_Window) != 0) {
 			return false;
 		}
-
-		for (int i = 0; i < IM_ARRAYSIZE(io.MouseDown); i++)
-			{
-				// If a mouse press event came, always pass it as "mouse held this frame", so we don't miss click-release events that are shorter than 1 frame.
-				io.MouseDown[i] = g_MouseJustPressed[i] || glfwGetMouseButton(m_Window, i) != 0;
-				g_MouseJustPressed[i] = false;
-			}
-
-			// Update mouse position
-			const ImVec2 mouse_pos_backup = io.MousePos;
-			io.MousePos = ImVec2(-FLT_MAX, -FLT_MAX);
-#ifdef __EMSCRIPTEN__
-			const bool focused = true; // Emscripten
-#else
-			const bool focused = glfwGetWindowAttrib(m_Window, GLFW_FOCUSED) != 0;
-#endif
-			if (focused)
-			{
-				if (io.WantSetMousePos)
-				{
-					glfwSetCursorPos(m_Window, (double)mouse_pos_backup.x, (double)mouse_pos_backup.y);
-				}
-				else
-				{
-					double mouse_x, mouse_y;
-					glfwGetCursorPos(m_Window, &mouse_x, &mouse_y);
-					io.MousePos = ImVec2((float)mouse_x, (float)mouse_y);
-				}
-			}
 	#endif
 
 	ImGui_Update();
@@ -1734,9 +1380,7 @@ void Example::draw()
 	#if defined(IM3D_PLATFORM_WIN)
 		winAssert(ValidateRect(m_hwnd, 0)); // suppress WM_PAINT
 
-		#if defined(IM3D_OPENGL)
-			winAssert(SwapBuffers(m_hdc));
-		#elif defined(IM3D_DX11)
+		#if defined(IM3D_DX11)
 			m_dxgiSwapChain->Present(0, 0);
 		#endif
 	#endif
@@ -1747,6 +1391,7 @@ void Example::draw()
 
  // reset state & clear backbuffer for next frame
 	#if defined(IM3D_OPENGL)
+		glAssert(glDisable(GL_BLEND));
 		glAssert(glBindVertexArray(0));
 		glAssert(glUseProgram(0));
 		glAssert(glViewport(0, 0, m_width, m_height));
@@ -1761,12 +1406,7 @@ void Example::draw()
 
 bool Example::hasFocus() const
 {
-	#if defined(IM3D_PLATFORM_WIN)
-		return m_hwnd == GetFocus();
-	#elif defined(IM3D_PLATFORM_LINUX)
-		return glfwGetWindowAttrib(m_Window, GLFW_FOCUSED) != 0;
-	#endif
-		return false;
+	return glfwGetWindowAttrib(m_Window, GLFW_FOCUSED) != 0;
 }
 
 Vec2 Example::getWindowRelativeCursor() const

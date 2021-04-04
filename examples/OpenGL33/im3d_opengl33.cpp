@@ -107,35 +107,15 @@ namespace {
     bool isKeyDown(Im3d::Key key) {
         switch (key) {
             case Im3d::Key_LControl:
-            #if defined(IM3D_PLATFORM_WIN)
-                return (GetAsyncKeyState(VK_LCONTROL) & 0x8000) != 0;
-            #elif defined(IM3D_PLATFORM_LINUX)
                 return glfwGetKey(g_Example->m_Window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS;
-            #endif
             case Im3d::Key_L:
-            #if defined(IM3D_PLATFORM_WIN)
-                return (GetAsyncKeyState(0x4c) & 0x8000) != 0;
-            #elif defined(IM3D_PLATFORM_LINUX)
                 return glfwGetKey(g_Example->m_Window, GLFW_KEY_L) == GLFW_PRESS;
-            #endif
             case Im3d::Key_T:
-            #if defined(IM3D_PLATFORM_WIN)
-                return (GetAsyncKeyState(0x54) & 0x8000) != 0;
-            #elif defined(IM3D_PLATFORM_LINUX)
                 return glfwGetKey(g_Example->m_Window, GLFW_KEY_T) == GLFW_PRESS;
-            #endif
             case Im3d::Key_R:
-            #if defined(IM3D_PLATFORM_WIN)
-                return (GetAsyncKeyState(0x52) & 0x8000) != 0;
-            #elif defined(IM3D_PLATFORM_LINUX)
                 return glfwGetKey(g_Example->m_Window, GLFW_KEY_R) == GLFW_PRESS;
-            #endif
             case Im3d::Key_S:
-            #if defined(IM3D_PLATFORM_WIN)
-                return (GetAsyncKeyState(0x53) & 0x8000) != 0;
-            #elif defined(IM3D_PLATFORM_LINUX)
                 return glfwGetKey(g_Example->m_Window, GLFW_KEY_S) == GLFW_PRESS;
-            #endif
         }
         return false;
     }
@@ -143,11 +123,7 @@ namespace {
     bool isMouseButtonDown(Im3d::Key key) {
         switch (key) {
             case Im3d::Mouse_Left:
-	        #if defined(IM3D_PLATFORM_WIN)
-                return (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0;
-            #elif defined(IM3D_PLATFORM_LINUX)
                 return glfwGetMouseButton(g_Example->m_Window, GLFW_MOUSE_BUTTON_1) == GLFW_PRESS;
-            #endif
         }
         return false;
     }

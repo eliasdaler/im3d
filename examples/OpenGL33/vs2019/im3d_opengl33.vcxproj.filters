@@ -168,6 +168,12 @@
     <ClInclude Include="..\..\common\im3d_example.h">
       <Filter>common</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\common\imgui\backends\imgui_impl_glfw.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\imgui\backends\imgui_impl_opengl3.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\common\imgui\imconfig.h">
       <Filter>imgui</Filter>
     </ClInclude>
@@ -199,6 +205,12 @@
     </ClCompile>
     <ClCompile Include="..\..\common\im3d_example.cpp">
       <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\imgui\backends\imgui_impl_glfw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\common\imgui\backends\imgui_impl_opengl3.cpp">
+      <Filter>imgui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\common\imgui\imgui.cpp">
       <Filter>imgui</Filter>

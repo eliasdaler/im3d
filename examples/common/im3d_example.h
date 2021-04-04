@@ -29,8 +29,12 @@
 
 	#define IM3D_PLATFORM_LINUX
 
-	#include <GL/glew.h>
+#if defined(IM3D_OPENGL)
+	#include <GL/glew.h> // needs to be defined before glfw3.h include
+#endif
+
 	#include <GLFW/glfw3.h>
+	#include <imgui/backends/imgui_impl_glfw.h>
 #elif defined(__linux__)
  // Linux
 	#define IM3D_PLATFORM_LINUX
@@ -48,7 +52,6 @@
 	//#define IM3D_OPENGL_VMIN    3
 	//#define IM3D_OPENGL_VSHADER "#version 150"
 
-	#include "GL/glew.h"
 	#define glAssert(call) \
 		do { \
 			(call); \
@@ -69,6 +72,7 @@
 		const char* GlGetString(GLenum _name);
 	}
 
+	#include <imgui/backends/imgui_impl_opengl3.h>
 #elif defined(IM3D_DX11)
  // DirectX 11
 	#include <d3d11.h>

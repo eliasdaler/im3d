@@ -57,6 +57,7 @@ workspace "im3d_opengl33"
 		defines { "IM3D_OPENGL_VMAJ=3", "IM3D_OPENGL_VMIN=3", "IM3D_OPENGL_VSHADER=330" }
 
 		includedirs { EXAMPLE_COMMON_DIR .. "glfw/glfw-3.3.3/include/" }
+		includedirs { EXAMPLE_COMMON_DIR .. "imgui" }
 		links { "GLFW" }
 
 		includedirs({
@@ -77,6 +78,13 @@ workspace "im3d_opengl33"
 				EXAMPLE_COMMON_DIR .."imgui/backends/**",
 				EXAMPLE_COMMON_DIR .."imgui/examples/**",
 				EXAMPLE_COMMON_DIR .."imgui/misc/**",
+		})
+
+		files({
+			EXAMPLE_COMMON_DIR .."imgui/backends/imgui_impl_glfw.h",
+			EXAMPLE_COMMON_DIR .."imgui/backends/imgui_impl_glfw.cpp",
+			EXAMPLE_COMMON_DIR .."imgui/backends/imgui_impl_opengl3.h",
+			EXAMPLE_COMMON_DIR .."imgui/backends/imgui_impl_opengl3.cpp"
 		})
 
 include(EXAMPLE_COMMON_DIR .. "glfw/glfw.lua")
