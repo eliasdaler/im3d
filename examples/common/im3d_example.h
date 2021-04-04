@@ -14,19 +14,23 @@
 // Platform
 #if defined(_WIN32) || defined(_WIN64)
  // Windows
-	#define IM3D_PLATFORM_WIN
+	// #define IM3D_PLATFORM_WIN
 
 	#define NOMINMAX 1
 	#define WIN32_LEAN_AND_MEAN 1
 	#define VC_EXTRALEAN 1
 	#include <Windows.h>
 
-	#define winAssert(e) IM3D_VERIFY_MSG(e, Im3d::GetPlatformErrorString(GetLastError()))
+	#define winAssert(e) IM3D_ASSERT(e)
 
-	namespace Im3d {
-		const char* GetPlatformErrorString(DWORD _err);
-	}
+	//namespace Im3d {
+	//	const char* GetPlatformErrorString(DWORD _err);
+	// }
 
+	#define IM3D_PLATFORM_LINUX
+
+	#include <GL/glew.h>
+	#include <GLFW/glfw3.h>
 #elif defined(__linux__)
  // Linux
 	#define IM3D_PLATFORM_LINUX

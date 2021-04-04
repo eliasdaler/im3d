@@ -56,10 +56,8 @@ workspace "im3d_opengl33"
 
 		defines { "IM3D_OPENGL_VMAJ=3", "IM3D_OPENGL_VMIN=3", "IM3D_OPENGL_VSHADER=330" }
 
-		if os.host() == "linux" then
-			includedirs { EXAMPLE_COMMON_DIR .. "glfw/glfw-3.3.3/include/" }
-			links { "GLFW" }
-		end
+		includedirs { EXAMPLE_COMMON_DIR .. "glfw/glfw-3.3.3/include/" }
+		links { "GLFW" }
 
 		includedirs({
 			IM3D_DIR,
@@ -75,12 +73,4 @@ workspace "im3d_opengl33"
 			"*.cpp"
 			})
 
-		if os.host() ~= "linux" then
-			excludes({
-				EXAMPLE_COMMON_DIR .."glfw/**"
-			})
-		end
-
-if os.host() == "linux" then
-	include(EXAMPLE_COMMON_DIR .. "glfw/glfw.lua")
-end
+include(EXAMPLE_COMMON_DIR .. "glfw/glfw.lua")

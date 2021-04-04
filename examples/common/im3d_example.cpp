@@ -18,9 +18,11 @@ using namespace Im3d;
 #endif
 
 #ifdef IM3D_PLATFORM_LINUX
+#ifdef __linux__
 #include <linux/limits.h>
 #include <stdlib.h>
 #include <unistd.h>
+#endif
 #endif
 
 static const char* StripPath(const char* _path)
@@ -426,7 +428,7 @@ static const char* StripPath(const char* _path)
 
 /******************************************************************************/
 #if defined(IM3D_PLATFORM_LINUX)
-	static const int ImGuiMouseButton_COUNT = 3; // TODO: update ImGui!
+	static const int ImGuiMouseButton_COUNT = 5; // TODO: update ImGui!
 	static bool g_MouseJustPressed[ImGuiMouseButton_COUNT] = {};
 
 	static void ImGui_ImplGlfw_MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
@@ -1432,7 +1434,7 @@ bool Example::init(int _width, int _height, const char* _title)
 	g_Example = this;
 	memset(g_Example, 0, sizeof(Example));
 
-	#if defined(IM3D_PLATFORM_WIN)
+	#if defined(_WIN32) || defined(_WIN64)
 	 // force the current working directory to the exe location
 		TCHAR buf[MAX_PATH] = {};
 		DWORD buflen;
@@ -1442,11 +1444,11 @@ bool Example::init(int _width, int _height, const char* _title)
 		winAssert(SetCurrentDirectory(buf));
 		fprintf(stdout, "Set current directory: '%s'\n", buf);
 
-		winAssert(QueryPerformanceFrequency(&g_SysTimerFreq));
-		winAssert(QueryPerformanceCounter(&m_currTime));
+		// winAssert(QueryPerformanceFrequency(&g_SysTimerFreq));
+		// winAssert(QueryPerformanceCounter(&m_currTime));
 	#endif
 
-	#if defined(IM3D_PLATFORM_LINUX)
+	#if defined(__linux__)
 	 // force the current working directory to the exe location
 		char result[ PATH_MAX ];
 		readlink( "/proc/self/exe", result, PATH_MAX );

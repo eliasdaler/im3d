@@ -7,6 +7,30 @@
     <Filter Include="common\GL">
       <UniqueIdentifier>{5079AB3B-BCE3-5FB2-0522-115871CB3D07}</UniqueIdentifier>
     </Filter>
+    <Filter Include="common\glfw">
+      <UniqueIdentifier>{2D2F81D4-99E4-F9C9-22D9-F3A08E8DF0CD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\glfw\glfw-3.3.3">
+      <UniqueIdentifier>{8EBECC42-7AB8-F594-6325-8CA54FBE5B01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\glfw\glfw-3.3.3\deps">
+      <UniqueIdentifier>{69193B65-D526-694B-5E0D-6536CA193502}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\glfw\glfw-3.3.3\deps\glad">
+      <UniqueIdentifier>{10368D2B-FC86-786D-25EB-662F119B0BD7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\glfw\glfw-3.3.3\deps\mingw">
+      <UniqueIdentifier>{1A1E9F9D-868C-F41C-CF75-AF1C3B23EAB8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\glfw\glfw-3.3.3\include">
+      <UniqueIdentifier>{01943E42-EDB9-08A9-D6FF-8D74C2C42D75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\glfw\glfw-3.3.3\include\GLFW">
+      <UniqueIdentifier>{E0F74A9A-4CB1-B544-D510-D01E41C96BB4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\glfw\glfw-3.3.3\src">
+      <UniqueIdentifier>{A5132141-9123-CD11-FADC-3130E60BBCAA}</UniqueIdentifier>
+    </Filter>
     <Filter Include="common">
       <UniqueIdentifier>{AEFEE3F6-9AA0-0ECD-835B-22216F9C951D}</UniqueIdentifier>
     </Filter>
@@ -38,6 +62,108 @@
     </ClInclude>
     <ClInclude Include="..\..\common\GL\wglew.h">
       <Filter>common\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\deps\getopt.h">
+      <Filter>common\glfw\glfw-3.3.3\deps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\deps\glad\gl.h">
+      <Filter>common\glfw\glfw-3.3.3\deps\glad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\deps\glad\khrplatform.h">
+      <Filter>common\glfw\glfw-3.3.3\deps\glad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\deps\glad\vk_platform.h">
+      <Filter>common\glfw\glfw-3.3.3\deps\glad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\deps\glad\vulkan.h">
+      <Filter>common\glfw\glfw-3.3.3\deps\glad</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\deps\linmath.h">
+      <Filter>common\glfw\glfw-3.3.3\deps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\deps\mingw\_mingw_dxhelper.h">
+      <Filter>common\glfw\glfw-3.3.3\deps\mingw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\deps\mingw\dinput.h">
+      <Filter>common\glfw\glfw-3.3.3\deps\mingw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\deps\mingw\xinput.h">
+      <Filter>common\glfw\glfw-3.3.3\deps\mingw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\deps\nuklear.h">
+      <Filter>common\glfw\glfw-3.3.3\deps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\deps\nuklear_glfw_gl2.h">
+      <Filter>common\glfw\glfw-3.3.3\deps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\deps\stb_image_write.h">
+      <Filter>common\glfw\glfw-3.3.3\deps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\deps\tinycthread.h">
+      <Filter>common\glfw\glfw-3.3.3\deps</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\include\GLFW\glfw3.h">
+      <Filter>common\glfw\glfw-3.3.3\include\GLFW</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\include\GLFW\glfw3native.h">
+      <Filter>common\glfw\glfw-3.3.3\include\GLFW</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\src\cocoa_joystick.h">
+      <Filter>common\glfw\glfw-3.3.3\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\src\cocoa_platform.h">
+      <Filter>common\glfw\glfw-3.3.3\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\src\egl_context.h">
+      <Filter>common\glfw\glfw-3.3.3\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\src\glx_context.h">
+      <Filter>common\glfw\glfw-3.3.3\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\src\internal.h">
+      <Filter>common\glfw\glfw-3.3.3\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\src\linux_joystick.h">
+      <Filter>common\glfw\glfw-3.3.3\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\src\mappings.h">
+      <Filter>common\glfw\glfw-3.3.3\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\src\nsgl_context.h">
+      <Filter>common\glfw\glfw-3.3.3\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\src\null_joystick.h">
+      <Filter>common\glfw\glfw-3.3.3\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\src\null_platform.h">
+      <Filter>common\glfw\glfw-3.3.3\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\src\osmesa_context.h">
+      <Filter>common\glfw\glfw-3.3.3\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\src\posix_thread.h">
+      <Filter>common\glfw\glfw-3.3.3\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\src\posix_time.h">
+      <Filter>common\glfw\glfw-3.3.3\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\src\wgl_context.h">
+      <Filter>common\glfw\glfw-3.3.3\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\src\win32_joystick.h">
+      <Filter>common\glfw\glfw-3.3.3\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\src\win32_platform.h">
+      <Filter>common\glfw\glfw-3.3.3\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\src\wl_platform.h">
+      <Filter>common\glfw\glfw-3.3.3\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\src\x11_platform.h">
+      <Filter>common\glfw\glfw-3.3.3\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\common\glfw\glfw-3.3.3\src\xkb_unicode.h">
+      <Filter>common\glfw\glfw-3.3.3\src</Filter>
     </ClInclude>
     <ClInclude Include="..\..\common\im3d_example.h">
       <Filter>common</Filter>
