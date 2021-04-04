@@ -209,6 +209,9 @@
     <ClCompile Include="..\..\common\imgui\imgui_draw.cpp">
       <Filter>imgui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\common\imgui\imgui_tables.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\common\imgui\imgui_widgets.cpp">
       <Filter>imgui</Filter>
     </ClCompile>

@@ -17,7 +17,7 @@ int main(int, char**)
 
 		ImGui::Begin("Im3d Demo", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
-		ImGui::SetNextTreeNodeOpen(true, ImGuiSetCond_Once);
+		ImGui::SetNextTreeNodeOpen(true, ImGuiCond_Once);
 		if (ImGui::TreeNode("About"))
 		{
 			ImGui::Text("Welcome to the Im3d demo!");
@@ -32,7 +32,7 @@ int main(int, char**)
 		}
 		ImGui::Spacing();
 
-		ImGui::SetNextTreeNodeOpen(true, ImGuiSetCond_Once);
+		ImGui::SetNextTreeNodeOpen(true, ImGuiCond_Once);
 		if (ImGui::TreeNode("Unified Gizmo"))
 		{
 		 // Unified gizmo operates directly on a 4x4 matrix using the context-global gizmo modes.
@@ -512,7 +512,7 @@ int main(int, char**)
 		}
 
 
-		ImGui::SetNextTreeNodeOpen(true, ImGuiSetCond_Once);
+		ImGui::SetNextTreeNodeOpen(true, ImGuiCond_Once);
 		if (ImGui::TreeNode("Grid"))
 		{
 			static int gridSize = 20;

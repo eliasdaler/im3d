@@ -428,7 +428,6 @@ static const char* StripPath(const char* _path)
 
 /******************************************************************************/
 #if defined(IM3D_PLATFORM_LINUX)
-	static const int ImGuiMouseButton_COUNT = 5; // TODO: update ImGui!
 	static bool g_MouseJustPressed[ImGuiMouseButton_COUNT] = {};
 
 	static void ImGui_ImplGlfw_MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
@@ -1121,8 +1120,6 @@ Color Im3d::RandColor(float _min, float _max)
 		glAssert(glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, txX, txY, 0, GL_RED, GL_UNSIGNED_BYTE, (const GLvoid*)txbuf));
 		io.Fonts->TexID = (void*)(intptr_t)g_ImGuiFontTexture;
 
-		io.RenderDrawListsFn = &ImGui_Draw;
-
 		ImGui::StyleColorsDark();
 
 		return true;
@@ -1785,6 +1782,7 @@ void Example::draw()
 	Im3d_EndFrame();
 
 	ImGui::Render();
+	ImGui_Draw(ImGui::GetDrawData());
 
 	#if defined(IM3D_PLATFORM_WIN)
 		winAssert(ValidateRect(m_hwnd, 0)); // suppress WM_PAINT
@@ -1890,14 +1888,15 @@ void Example::drawTextDrawListsImGui(const Im3d::TextDrawList _textDrawLists[], 
 			// Pixel coordinates for the ImGuiWindow ImGui.
 			screen = screen * Vec2(0.5f) + Vec2(0.5f);
 			screen.y = 1.0f - screen.y; // screen space origin is reversed by the projection.
-			screen = screen * (Vec2)ImGui::GetWindowSize();
+			screen = screen * (Vec2)(ImGui::GetWindowSize().x, ImGui::GetWindowSize().y);
 
 			// All text data is stored in a single buffer; each textData instance has an offset into this buffer.
 			const char* text = textDrawList.m_textBuffer + textData.m_textBufferOffset;
 
 			// Calculate the final text size in pixels to apply alignment flags correctly.
 			ImGui::SetWindowFontScale(textData.m_positionSize.w); // NB no CalcTextSize API which takes a font/size directly...
-			Vec2 textSize = ImGui::CalcTextSize(text, text + textData.m_textLength);
+			ImVec2 ts = ImGui::CalcTextSize(text, text + textData.m_textLength);
+			Vec2 textSize = Vec2(ts.x, ts.y);
 			ImGui::SetWindowFontScale(1.0f);
 
 			// Generate a pixel offset based on text flags.
@@ -1922,7 +1921,7 @@ void Example::drawTextDrawListsImGui(const Im3d::TextDrawList _textDrawLists[], 
 
 			// Add text to the window draw list.
 			screen = screen + textOffset;
-			imDrawList->AddText(nullptr, textData.m_positionSize.w * ImGui::GetFontSize(), screen, textData.m_color.getABGR(), text, text + textData.m_textLength);
+			imDrawList->AddText(nullptr, textData.m_positionSize.w * ImGui::GetFontSize(), ImVec2(screen.x, screen.y), textData.m_color.getABGR(), text, text + textData.m_textLength);
 		}
 	}
 

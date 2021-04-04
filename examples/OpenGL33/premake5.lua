@@ -72,5 +72,11 @@ workspace "im3d_opengl33"
 			EXAMPLE_COMMON_DIR .. "**.cpp",
 			"*.cpp"
 			})
+		
+		excludes({
+				EXAMPLE_COMMON_DIR .."imgui/backends/**",
+				EXAMPLE_COMMON_DIR .."imgui/examples/**",
+				EXAMPLE_COMMON_DIR .."imgui/misc/**",
+		})
 
 include(EXAMPLE_COMMON_DIR .. "glfw/glfw.lua")
